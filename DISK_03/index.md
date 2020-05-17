@@ -1,0 +1,58 @@
+---
+has_children: true
+nav_order: 4
+---
+
+# DISK 3
+
+Referred to as the TOWN disk.
+
+## Files not yet covered
+
+DISK
+MAPA
+MAPB
+MAPC
+MAPD
+MAPE
+MAPF
+MAPG
+MAPH
+MAPI
+MAPJ
+MAPK
+MAPL
+MAPM
+MAPN
+MAPO
+MAPP
+MAP@
+CONB
+CONF
+CONG
+CONH
+CONO
+CONR
+CONS
+CONC
+COND
+CONA
+SHPS
+SHP0
+SHP1
+SHP2
+SHP3
+SHP4
+SHP5
+SHP6
+SHP7
+SHP8
+SHP9
+TMAP
+TALK
+SEAR
+USE
+MIX
+MUST
+MUSC
+
