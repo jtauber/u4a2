@@ -5,14 +5,16 @@ nav_order: 6
 # Zero Page Notes
 
 ```
+$0A - related to player location
 $0B - if #$03, we're in a dungeon
 
 $0C - in dungeon, what level we're on (one less than what's displayed, e.g. #$00 = level 1)
 
-$0E - might be what player's icon/tile is
-  if < 0x14 then on ship?
-  0x14 and 0x15 are responsive to Yell (resulting in 'woah!' or 'giddyup!')
-  0x1F after resurrection
+$0E - what player's icon/tile is
+      0x10 - 0x13 ship
+      0x14 - 0x15 horse
+      0x18 balloon
+      0x1F on foot
 $0F - party size
 
 $10 - in dungeon, what direction we're facing

@@ -25,7 +25,7 @@ LEN $1800
 0824  4C A9 0F      JMP $0FA9     ; display character in game font
 0827  4C 19 13      JMP $1319     ; set the hires page one to all 0x80
 082A  4C 69 13      JMP $1369
-082D  4C 02 10      JMP $1002     ; set $FE/$FF vector based on $D4
+082D  4C 02 10      JMP $1002     ; set $FE/$FF vector based on $D4 (character number)
 0830  4C 31 10      JMP $1031
 0833  4C 7C 10      JMP $107C     ; output a byte as two digits
 0836  4C 67 10      JMP $1067     ; rotate cursor, print it, and decrement text column
@@ -534,6 +534,7 @@ LEN $1800
 0B9C    D0 06       BNE ---         ;
 0B9E    99 00 02    STA $0200,Y     ;
 0BA1    4C BC 0B    JMP $0BBC       ;
+
 0BA4    20 4A 15    JSR $154A       ; random number generator?
 0BA7    29 01       AND #$01        ;
 0BA9    F0 0B       BEQ ---         ;
@@ -541,6 +542,7 @@ LEN $1800
 0BAE    BD 60 EF    LDA $EF60,X     ;
 0BB1    29 03       AND #$03        ;
 0BB3    4C 86 0B    JMP $0B86       ;
+
 0BB6    BD 60 EF    LDA $EF60,X     ;
 0BB9    99 00 02    STA $0200,Y     ;
 0BBC    CA          DEX             ;
@@ -564,6 +566,7 @@ LEN $1800
 0BE4    D0 05       BNE ---         ;
 0BE6    A9 7D       LDA #$7D        ;
 0BE8    4C F4 0B    JMP $0BF4       ;
+
 0BEB    20 4A 15    JSR $154A       ; random number generator?
 0BEE    29 01       AND #$01        ;
 0BF0    18          CLC             ;
@@ -929,52 +932,71 @@ LEN $1800
 0E6D    C6 C5       DEC $C5         ;
 0E6F    30 03       BMI ---         ;
 0E71    4C EE 0D    JMP $0DEE       ;
+```
 
+```
 ;; draw map (described in $02XX?)
 
-0E74    A9 00       LDA #$00        ; A = 0x00
-0E76    85 F2       STA $F2         ; _F2 = 0x00
-0E78    8D 9D 0E    STA $0E9D       ;
+0E74    A9 00       LDA #$00        ;
+0E76    85 F2       STA $F2         ; we set $F2 to 0x00
+0E78    8D 9D 0E    STA $0E9D       ; we also set the low byte of address in $02XX to load in $0E9C
+
 0E7B    A4 F2       LDY $F2         ; Y = 0x00
 0E7D    B9 08 E0    LDA $E008,Y     ; A = 0x80
-0E80    8D A6 0E    STA $0EA6       ;
-0E83    8D B0 0E    STA $0EB0       ;
+0E80    8D A6 0E    STA $0EA6       ; set low byte of video RAM to write to in $0EA5
+0E83    8D B0 0E    STA $0EB0       ; set low byte of video RAM to write to in $0EAF
 0E86    B9 C8 E0    LDA $E0C8,Y     ; A = 0x20
-0E89    8D A7 0E    STA $0EA7       ;
-0E8C    8D B1 0E    STA $0EB1       ;
+0E89    8D A7 0E    STA $0EA7       ; set high byte of video RAM to write to in $0EA5
+0E8C    8D B1 0E    STA $0EB1       ; set high byte of video RAM to write to in $0EAF
 0E8F    98          TYA             ; A = Y = 0x00
 0E90    29 0F       AND #$0F        ; 0x00
 0E92    09 D0       ORA #$D0        ; 0xD0
-0E94    8D A4 0E    STA $0EA4       ;
-0E97    8D AE 0E    STA $0EAE       ;
+0E94    8D A4 0E    STA $0EA4       ; set high byte of D000 bank 1 to read (SHP0)
+0E97    8D AE 0E    STA $0EAE       ; set high byte of D000 bank 2 to read (SHP1)
+
+;; loop from X = 1 to 17 (exclusive)
+
+; these are the rows of the shape
+
 0E9A    A2 01       LDX #$01        ; X = 0x01
+
+;; get the shape number from 02XX,
+;; look up the Xth row in the D000 banks (SHP0 and SHP1 files),
+;; and write to video RAM
+
 0E9C    AC 00 02    LDY $02__       ; Y = ($0200)
-0E9F    2C 8B C0    BIT $C08B       ;
+0E9F    2C 8B C0    BIT $C08B       ; use D000 bank 1 R/W
 0EA2    B9 00 FF    LDA $__00,Y     ; A = _D000[Y]
 0EA5    9D FF FF    STA $____,X     ; 9D 80 20   STA $2080,X
 0EA8    E8          INX             ; X++
-0EA9    2C 83 C0    BIT $C083       ;
+0EA9    2C 83 C0    BIT $C083       ; use D000 bank 2 R/W
 0EAC    B9 00 FF    LDA $__00,Y     ; $D000
 0EAF    9D FF FF    STA $____,X     ; 9D 80 20   STA $2080,X
-0EB2    EE 9D 0E    INC $0E9D       ;
-0EB5    E8          INX             ; X++
-0EB6    E0 17       CPX #$17        ;
-0EB8    90 E2       BCC ---         ;
-0EBA    E6 F2       INC $F2         ;
+
+0EB2    EE 9D 0E    INC $0E9D       ; increment our position in $02XX
+0EB5    E8          INX             ; and increment X
+0EB6    E0 17       CPX #$17        ; if X < 0x17
+0EB8    90 E2       BCC $0E9C       ;   loop back
+
+0EBA    E6 F2       INC $F2         ; increment $F2
 0EBC    A5 F2       LDA $F2         ;
-0EBE    C9 B0       CMP #$B0        ;
-0EC0    F0 13       BEQ ---         ;
+0EBE    C9 B0       CMP #$B0        ; if $F2 == 0xB0
+0EC0    F0 13       BEQ $0ED5       ; return
+
 0EC2    29 0F       AND #$0F        ;
-0EC4    F0 B5       BEQ ---         ;
-0EC6    AD 9D 0E    LDA $0E9D       ;
-0EC9    38          SEC             ;
-0ECA    E9 0B       SBC #$0B        ;
-0ECC    8D 9D 0E    STA $0E9D       ;
+0EC4    F0 B5       BEQ $0E7B       ;
+
+0EC6    AD 9D 0E    LDA $0E9D       ; go back 11 tiles
+0EC9    38          SEC             ; .
+0ECA    E9 0B       SBC #$0B        ; .
+0ECC    8D 9D 0E    STA $0E9D       ; set the low byte of address in $02XX to load in $0E9C
 0ECF    20 0C 15    JSR $150C       ; process any keypress onto $B0 buffer
-0ED2    4C 7B 0E    JMP $0E7B       ;
+0ED2    4C 7B 0E    JMP $0E7B       ; loop back
 
 0ED5    60          RTS             ;
+```
 
+```
 ;; DATA (3 arrays)
 
 0ED6  01 01 01 01 01 00 FF FF FF FF FF
@@ -1169,15 +1191,18 @@ LEN $1800
 
 0FFF  6C 36 00      JMP ($0036)   ; OUTPUT ROUTINE
 
-;; set $FE/$FF vector based on $D4
+;; set $FE/$FF vector to character data for character $D4
 
-1002    A5 D4       LDA $D4         ;
+; $FE = 32 x (character_num - 1)
+; $FF = 0xEC
+
+1002    A5 D4       LDA $D4         ; load character number
 1004    38          SEC             ;
 1005    E9 01       SBC #$01        ;
 1007    20 06 15    JSR $1506       ; x32
 100A    85 FE       STA $FE         ;
 100C    A9 EC       LDA #$EC        ;
-100E    85 FF       STA $FF         ; $FE/$FF vector = 0xECXX where X is based on $D4 @@@
+100E    85 FF       STA $FF         ; $FE/$FF vector = 0xECXX where X is 0x20 times ($D4 - 1)
 1010    60          RTS             ;
 
 ;; display player name? (how is this different from $104A ?)
@@ -1742,7 +1767,7 @@ LEN $1800
 13A6    A9 4C       LDA #$4C        ;
 13A8    4C AB 13    JMP $13AB       ; call $13AB with A = 0x4C (and return)
 
-;;
+;; D000 in two different banks contains the shape files
 
 13AB    A8          TAY             ; Y = A
 13AC    2C 83 C0    BIT $C083       ; RD LC RAM bank2, WR-enable LC RAM

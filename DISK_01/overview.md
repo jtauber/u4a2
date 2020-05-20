@@ -69,6 +69,7 @@ Other files still to investigate.
 ### ED00
 
 * `$00` thru `$07` - virtue scores ???
+* `$08` - torch count?
 * `$10` - first two digits of food
 * `$11` - next two digits of food
 * `$13` - first two digits of gold

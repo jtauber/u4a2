@@ -14,10 +14,11 @@ LEN $4800
 
 4000    4C 09 40    JMP $4009       ;
 4003    4C DE 6D    JMP $6DDE       ;
-4006    4C 8B 70    JMP $708B       ;
 
-4009    A9 00       LDA #$00        ;
-400B    20 20 03    JSR $0320       ; SEL?
+4006    4C 8B 70    JMP $708B       ; enter combat with map already loaded
+
+4009    A9 00       LDA #$00        ; .
+400B    20 20 03    JSR $0320       ; call $0320 with A = 00
 400E    2C 8B C0    BIT $C08B       ; bank switch?
 4011    2C 8B C0    BIT $C08B       ; bank switch?
 4014    20 12 08    JSR $0812       ; set the hires page one to all 0x80
@@ -70,8 +71,8 @@ LEN $4800
 40A0    20 03 08    JSR $0803       ; ???
 40A3    A9 FF       LDA #$FF        ;
 40A5    85 CD       STA $CD         ; _CD = 0xFF
-40A7    A9 CF       LDA #$CF        ; A = 0xCF
-40A9    20 20 03    JSR $0320       ; SEL ???
+40A7    A9 CF       LDA #$CF        ; .
+40A9    20 20 03    JSR $0320       ; call $0320 with A = 0xCF
 
 ;;
 
@@ -83,7 +84,7 @@ LEN $4800
 
 ;;
 
-40BA    20 21 08    JSR $0821       ;
+40BA    20 21 08    JSR $0821       ; PRINT
 
 40BD    8D 1E 00                                                                ^M.^@
 
@@ -818,8 +819,8 @@ LEN $4800
 4647    10 E8       BPL ---         ;
 4649    4C 84 63    JMP $6384       ; return to main loop
 
-464C    A9 00       LDA #$00        ;
-464E    20 20 03    JSR $0320       ;
+464C    A9 00       LDA #$00        ; .
+464E    20 20 03    JSR $0320       ; call $0320 with A = 00
 4651    20 21 08    JSR $0821       ; print
 
 4654    CC C5 C1 D6 C9 CE C7 AE AE AE 8D 00                                     LEAVING...^M^@
@@ -856,8 +857,8 @@ LEN $4800
 46A8    A9 F2       LDA #$F2        ;
 46AA    8D 5F EE    STA $EE5F       ;
 46AD    20 18 08    JSR $0818       ;
-46B0    A9 CF       LDA #$CF        ;
-46B2    20 20 03    JSR $0320       ;
+46B0    A9 CF       LDA #$CF        ; .
+46B2    20 20 03    JSR $0320       ; call $0320 with A = 0xCF
 46B5    A9 00       LDA #$00        ;
 46B7    85 B8       STA $B8         ;
 46B9    4C 84 63    JMP $6384       ; return to main loop
@@ -1371,38 +1372,96 @@ LEN $4800
 550C    C8 C5 D3 D4 A0 C8 CF CC C4 D3 BA 8D 00 A9 64 20 HEST HOLDS:..)d
 551C    FD 7E 20 28 85 20 34 86 A5 DA 20 33 08 20 21 08 }~ (. 4.%Z 3. !.
 552C    AD C7 CF CC C4 A1 8D 00 4C 84 63                -GOLD!..L.c
+```
 
+```
 ;; 'H' handler (Hole up and camp)
 
-5537    20 21 08
+5537    20 21 08    JSR $0821       ; PRINT
 
-553A    C8 EF                                           Ho
-553C    EC E5 A0 F5 F0 A0 A6 A0 E3 E1 ED F0 8D 00 A5 0A le up & camp..%.
-554C    F0 09 A5 0B C9 03 F0 03 4C B7 41 A5 0E C9 1F F0 p.%.I.p.L7A%.I.p
-555C    18 20 21 08 CD D5 D3 D4 A0 C2 C5 A0 CF CE A0 C6 . !.MUST BE ON F
-556C    CF CF D4 A1 8D 00 4C 84 63 A9 00 20 20 03 20 1B OOT!..L.c).  . .
-557C    08 84 C2 CC CF C1 C4 A0 C8 CF CC C5 AC C1 A4 B8 ..BLOAD HOLE,A$8
-558C    B8 B0 B0 8D 00 20 00 88 20 45 08 A9 01 20 20 03 800.. .. E.).  .
-559C    A5 0B C9 03 D0 03 20 06 8C 4C 84 63             %.I.P. ..L.c
+553A    C8 EF EC E5 A0 F5 F0 A0 A6 A0 E3 E1 ED F0 8D 00                         Hole up & camp^M
 
+554A    A5 0A       LDA $0A         ; if $0A == 0x00
+554C    F0 09       BEQ $5557       ;   skip ahead
+554E    A5 0B       LDA $0B         ; or if $0B == 0x03 (in dungeon?)
+5550    C9 03       CMP #$03        ; .
+5552    F0 03       BEQ $5557       ;   skip ahead
+5554    4C B7 41    JMP $41B7       ; otherwise, print NOT HERE! and return to main loop
+
+
+5557    A5 0E       LDA $0E         ; check player's icon/tile is
+5559    C9 1F       CMP #$1F        ; compare to normal icon
+555B    F0 18       BEQ $5575       ; if equal, skip ahead, otherwise
+555D    20 21 08    JSR $0821       ; PRINT
+
+5560    CD D5 D3 D4 A0 C2 C5 A0 CF CE A0 C6 CF CF D4 A1 8D 00                   MUST BE ON FOOT!^M
+
+5572    4C 84 63    JMP $6384       ; return to main loop
+
+5575    A9 00       LDA #$00        ; .
+5577    20 20 03    JSR $0320       ; call $0320 with A = 00
+557A    20 1B 08    JSR $081B       ; print to load file
+
+557D    84 C2 CC CF C1 C4 A0 C8 CF CC C5 AC C1 A4 B8 B8 B0 B0 8D 00             ^DBLOAD HOLE,A$8800^M
+
+5591    20 00 88    JSR $8800       ; call HOLE sub-routine
+5594    20 45 08    JSR $0845       ; DISPLAY STATS
+5597    A9 01       LDA #$01        ; .
+5599    20 20 03    JSR $0320       ; call $0320 with A = 01
+559C    A5 0B       LDA $0B         ; if $0B == 0x03 (in dungeon?)
+559E    C9 03       CMP #$03        ; .
+55A0    D0 03       BNE $55A5       ; .
+55A2    20 06 8C    JSR $8C06       ;     call $8C06 ??? (not even sure where this is)
+55A5    4C 84 63    JMP $6384       ; return to main loop
+```
+
+```
 ;; 'I' handler (Ignite torch)
 
-55A8    20 21 08
+55A8    20 21 08    JSR $0821       ; PRINT
 
-55AB    C9                                              I
-55AC    E7 EE E9 F4 E5 A0 F4 EF F2 E3 E8 A1 8D 00 A0 08 gnite torch!.. .
-55BC    20 5E 85 B0 03 4C F6 41 A9 64 85 11 A5 0B C9 03  ^.0.LvA)d..%.I.
-55CC    D0 03 20 06 8C 4C 84 63                         P. ..L.c
+55AB    C9 E7 EE E9 F4 E5 A0 F4 EF F2 E3 E8 A1 8D 00                            Ignite torch!^M
 
+55BA    A0 08       LDY #$08        ; decrease inventory item 0x08 (in Y) by 1
+55BC    20 5E 85    JSR $855E       ; .
+55BF    B0 03       BCS $55C4       ; if had none
+55C1    4C F6 41    JMP $41F6       ;     print YOU HAVE NONE!
+55C4    A9 64       LDA #$64        ; $11 := 0x64
+55C6    85 11       STA $11         ; .
+55C8    A5 0B       LDA $0B         ; if $0B == 0x3 (in dungeon?)
+55CA    C9 03       CMP #$03        ; .
+55CC    D0 03       BNE $55D1       ; .
+55CE    20 06 8C    JSR $8C06       ;     call $8C06 ??? (not even sure where this is)
+55D1    4C 84 63    JMP $6384       ; return to main loop
+```
+
+```
 ;; 'J' handler (Jimmy lock)
 
-55D4    20 21 08
+55D4    20 21 08    JSR $0821       ; PRINT
 
-55D7    CA E9 ED ED F9                                  Jimmy
-55DC    A0 EC EF E3 EB AD 00 20 96 83 A5 0B C9 01 D0 03  lock-. ..%.I.P.
-55EC    4C B7 41 20 93 08 C9 3A F0 03 4C B7 41 A0 0A 20 L7A ..I:p.L7A .
-55FC    5E 85 B0 03 4C F6 41 A9 3B A0 00 91 FC 4C E6 41 ^.0.LvA); ..|LfA
+55D7    CA E9 ED ED F9 A0 EC EF E3 EB AD 00                                     Jimmy lock-
 
+55E3    20 96 83    JSR $8396       ;
+55E6    A5 0B       LDA $0B         ;
+55E8    C9 01       CMP #$01        ;
+55EA    D0 03       BNE $55EF       ;
+55EC    4C B7 41    JMP $41B7       ; print NOT HERE! and return to main loop
+55EF    20 93 08    JSR $0893       ;
+55F2    C9 3A       CMP #$3A        ;
+55F4    F0 03       BEQ $55F9       ;
+55F6    4C B7 41    JMP $41B7       ; print NOT HERE! and return to main loop
+55F9    A0 0A       LDY #$0A        ;
+55FB    20 5E 85    JSR $855E       ;
+55FE    B0 03       BCS $5603       ;
+5600    4C F6 41    JMP $41F6       ;
+5603    A9 3B       LDA #$3B        ;
+5605    A0 00       LDY #$00        ;
+5607    91 FC       STA ($FC),Y     ;
+5609    4C E6 41    JMP $41E6       ;
+```
+
+```
 ;; 'K' handler (Klimb)
 
 560C    20 21 08
@@ -2707,6 +2766,8 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 ; $7082 is the @
 7078    84 C2 CC CF C1 C4 A0 C3 CF CE C0 AC C1 A4 B2 B4 B0 8D 00     ^DBLOAD CON@,A$240^M^@
 
+;; enter combat with map already loaded (possible from $4006)
+
 708B    A5 0B       LDA $0B         ; .
 708D    C9 82       CMP #$82        ; if _0B == 0x82
 708F    F0 06       BEQ $7097       ;     go to $7097
@@ -2842,7 +2903,7 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 7179    C6 D4       DEC $D4         ;
 717B    D0 D9       BNE ---         ;
 717D    A9 02       LDA #$02        ;
-717F    20 20 03    JSR $0320       ;
+717F    20 20 03    JSR $0320       ; call $0320 with A = 02
 7182    2C 10 C0    BIT $C010       ; unlatch key
 7185    A9 00       LDA #$00        ;
 7187    85 B8       STA $B8         ;
@@ -3460,8 +3521,8 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 
 ;; death?
 
-84C9    A9 00       LDA #$00        ; ???
-84CB    20 20 03    JSR $0320       ; ???
+84C9    A9 00       LDA #$00        ; .
+84CB    20 20 03    JSR $0320       ; call $0320 with A = 00
 84CE    A9 02       LDA #$02        ; request disk 2 (BRITANNIA)
 84D0    20 42 08    JSR $0842       ; .
 84D3    20 1B 08    JSR $081B       ;
@@ -3470,8 +3531,8 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 
 84EA    20 00 88    JSR $8800       ; call SAVE
 
-84ED    A9 01       LDA #$01        ; ???
-84EF    20 20 03    JSR $0320       ; ???
+84ED    A9 01       LDA #$01        ; .
+84EF    20 20 03    JSR $0320       ; call $0320 with A = 01
 84F2    4C 84 63    JMP $6384       ; return to main loop
 
 84F5    A5 0F       LDA $0F         ;
@@ -3545,7 +3606,7 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 855C    D8          CLD             ;
 855D    60          RTS             ;
 
-;; decrement _ED00[Y] by 1, @@@
+;; decrement _ED00[Y] by 1, (inventory)
 
 855E    F8          SED             ;
 855F    38          SEC             ;
