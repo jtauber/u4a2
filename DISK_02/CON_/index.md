@@ -7,7 +7,7 @@ nav_order: 3
 
 There are 13 CON_ files with _ taking the values B, C, D, E, F, G, H, I, O, P, R, S, and T.
 
-Each is of length 0xC0. After 64 bytes (which I have yet to analyse), there is an 11 x 11 map as shown below. The values refer to shapes but until I write code to use the shapes file, I'll just colour-code the hex.
+Each is of length 0xC0. After 0x40 bytes (which I have yet to analyse), there is an 11 x 11 map as shown below. The values refer to shapes but until I write code to use the shapes file, I'll just colour-code the hex.
 
 The code to choose which combat map to use is in [ULT4](/DISK_01/ULT4) at **$6FD5**. The combat map is loaded at **$706D**.
 
