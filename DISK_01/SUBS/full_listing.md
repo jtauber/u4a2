@@ -1201,7 +1201,9 @@ LEN $1800
 102C    18          CLC             ;
 102D    65 CE       ADC $CE         ; text col?
 102F    85 CE       STA $CE         ; text col?
+```
 
+```
 1031    20 02 10    JSR $1002       ; set $FE/$FF vector based on $D4
 1034    A9 00       LDA #$00        ;
 1036    85 DA       STA $DA         ; _DA = 0x00

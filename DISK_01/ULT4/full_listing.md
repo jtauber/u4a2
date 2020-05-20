@@ -824,7 +824,7 @@ LEN $4800
 
 4654    CC C5 C1 D6 C9 CE C7 AE AE AE 8D 00                                     LEAVING...^M^@
 
-4660    2C 10 C0    BIT $C010       ;
+4660    2C 10 C0    BIT $C010       ; unlatch key
 4663    A9 00       LDA #$00        ;
 4665    85 0B       STA $0B         ;
 4667    A9 02       LDA #$02        ; .
@@ -2126,7 +2126,7 @@ D3 CB D5    SKU
 638E    A5 1B       LDA $1B         ;
 6390    C9 50       CMP #$50        ;
 6392    B0 10       BCS $63A4       ;
-6394    20 4E 08    JSR $084E       ;
+6394    20 4E 08    JSR $084E       ; random number
 6397    29 03       AND #$03        ;
 6399    D0 09       BNE $63A4       ;
 639B    A5 1B       LDA $1B         ;
@@ -2142,7 +2142,7 @@ D3 CB D5    SKU
 63AD    B1 FE       LDA ($FE),Y     ;
 63AF    C9 D3       CMP #$D3        ;
 63B1    D0 0E       BNE $63C1       ;
-63B3    20 4E 08    JSR $084E       ;
+63B3    20 4E 08    JSR $084E       ; random number
 63B6    29 07       AND #$07        ;
 63B8    D0 1B       BNE ---         ;
 63BA    A9 C7       LDA #$C7        ;
@@ -2328,7 +2328,7 @@ D3 CB D5    SKU
 6540    B1 FE       LDA ($FE),Y     ;
 6542    C9 C7       CMP #$C7        ;
 6544    D0 3D       BNE ---         ;
-6546    20 4E 08    JSR $084E       ;
+6546    20 4E 08    JSR $084E       ; random number
 6549    29 07       AND #$07        ;
 654B    D0 0C       BNE ---         ;
 654D    A9 D0       LDA #$D0        ;
@@ -2344,7 +2344,7 @@ D3 CB D5    SKU
 6562    85 D4       STA $D4         ;
 6564    20 A9 7E    JSR $7EA9       ;
 6567    30 13       BMI ---         ;
-6569    20 4E 08    JSR $084E       ;
+6569    20 4E 08    JSR $084E       ; random number
 656C    29 03       AND #$03        ;
 656E    D0 0C       BNE ---         ;
 6570    A9 D3       LDA #$D3        ;
@@ -2694,7 +2694,9 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 7068    4C 6D 70    JMP $706D       ; load combat map
 
 706B    A9 C7       LDA #$C7        ; 'G'
+```
 
+```
 ;; load combat map
 
 706D    8D 82 70    STA $7082       ; set the right file name
@@ -2715,47 +2717,55 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 
 7097    A5 E8       LDA $E8         ; .
 7099    C9 02       CMP #$02        ; if _E8 != 0x02
-709B    D0 1A       BNE ---         ;
+709B    D0 1A       BNE $70B7       ;
 709D    A5 0B       LDA $0B         ;
 709F    C9 82       CMP #$82        ;
-70A1    F0 14       BEQ ---         ;
+70A1    F0 14       BEQ $70B7       ;
 70A3    A5 C0       LDA $C0         ;
 70A5    C9 50       CMP #$50        ;
-70A7    F0 05       BEQ ---         ;
+70A7    F0 05       BEQ $70AE       ;
 70A9    A9 00       LDA #$00        ;
 70AB    4C D1 70    JMP $70D1       ;
+```
 
+```
 70AE    A5 0F       LDA $0F         ;
 70B0    0A          ASL A           ;
 70B1    38          SEC             ;
 70B2    E9 01       SBC #$01        ;
 70B4    4C D1 70    JMP $70D1       ;
+```
 
+```
 70B7    A5 E6       LDA $E6         ;
-70B9    30 07       BMI ---         ;
-70BB    20 4E 08    JSR $084E       ;
-70BE    29 07       AND #$07        ;
-70C0    D0 0F       BNE ---         ;
-70C2    20 95 7E    JSR $7E95       ;
+70B9    30 07       BMI $70C2       ;
+70BB    20 4E 08    JSR $084E       ; random number
+70BE    29 07       AND #$07        ;   0-7
+70C0    D0 0F       BNE $70D1       ; if zero (12.5% chance)...
+70C2    20 95 7E    JSR $7E95       ; unknown calculation on A, I think a no-op in this case
 70C5    AA          TAX             ;
-70C6    BD 48 7E    LDA $7E48,X     ;
-70C9    20 FD 7E    JSR $7EFD       ;
+70C6    BD 48 7E    LDA $7E48,X     ; load data
+70C9    20 FD 7E    JSR $7EFD       ; some random manipulation
 70CC    18          CLC             ;
 70CD    7D 48 7E    ADC $7E48,X     ;
 70D0    4A          LSR A           ;
+```
 
+```
 ;;
 
 70D1    85 EA       STA $EA         ;
 70D3    8D 6C 7E    STA $7E6C       ;
 70D6    4A          LSR A           ;
 70D7    C5 0F       CMP $0F         ;
-70D9    90 09       BCC ---         ;
+70D9    90 09       BCC $70E4       ;
 70DB    A5 0F       LDA $0F         ;
 70DD    0A          ASL A           ;
-70DE    20 FD 7E    JSR $7EFD       ;
+70DE    20 FD 7E    JSR $7EFD       ; some random manipulation
 70E1    4C D1 70    JMP $70D1       ;
+```
 
+```
 70E4    20 4E 08    JSR $084E       ; random number
 70E7    29 0F       AND #$0F        ;    0-15
 70E9    AA          TAX             ;
@@ -2770,33 +2780,41 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 70FD    10 30       BPL ---         ;
 70FF    A5 EA       LDA $EA         ;
 7101    F0 0B       BEQ ---         ;
-7103    20 4E 08    JSR $084E       ;
+7103    20 4E 08    JSR $084E       ; random number
 7106    29 1F       AND #$1F        ;
 7108    F0 15       BEQ ---         ;
 710A    29 07       AND #$07        ;
 710C    F0 05       BEQ ---         ;
 710E    A5 E6       LDA $E6         ;
 7110    4C 2F 71    JMP $712F       ;
+```
 
+```
 7113    A5 E6       LDA $E6         ;
-7115    20 95 7E    JSR $7E95       ;
+7115    20 95 7E    JSR $7E95       ; unknown calculation on A
 7118    A8          TAY             ;
 7119    B9 24 7E    LDA $7E24,Y     ;
 711C    4C 2F 71    JMP $712F       ;
+```
+
+```
 711F    A5 E6       LDA $E6         ;
-7121    20 95 7E    JSR $7E95       ;
+7121    20 95 7E    JSR $7E95       ; unknown calculation on A
 7124    A8          TAY             ;
 7125    B9 24 7E    LDA $7E24,Y     ;
-7128    20 95 7E    JSR $7E95       ;
+7128    20 95 7E    JSR $7E95       ; unknown calculation on A
 712B    A8          TAY             ;
 712C    B9 24 7E    LDA $7E24,Y     ;
+```
+
+```
 712F    9D 50 EF    STA $EF50,X     ;
 7132    9D 60 EF    STA $EF60,X     ;
-7135    20 95 7E    JSR $7E95       ;
+7135    20 95 7E    JSR $7E95       ; unknown calculation on A
 7138    A8          TAY             ;
 7139    B9 F0 7D    LDA $7DF0,Y     ;
 713C    85 D8       STA $D8         ;
-713E    20 FD 7E    JSR $7EFD       ;
+713E    20 FD 7E    JSR $7EFD       ; some random manipulation
 7141    46 D8       LSR $D8         ;
 7143    05 D8       ORA $D8         ;
 7145    9D 40 EF    STA $EF40,X     ;
@@ -2817,18 +2835,43 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 7167    BD 68 02    LDA $0268,X     ;
 716A    9D 90 EF    STA $EF90,X     ;
 716D    20 BB 7E    JSR $7EBB       ; A = 00 if the given player is alive (GPS) otherwise FF
-7170    F0 07       BEQ ---         ;
+7170    F0 07       BEQ $7179       ;
 7172    A6 D4       LDX $D4         ;
 7174    A9 00       LDA #$00        ;
 7176    9D 9F EF    STA $EF9F,X     ;
 7179    C6 D4       DEC $D4         ;
-717B    D0          BNE ---         ;
+717B    D0 D9       BNE ---         ;
+717D    A9 02       LDA #$02        ;
+717F    20 20 03    JSR $0320       ;
+7182    2C 10 C0    BIT $C010       ; unlatch key
+7185    A9 00       LDA #$00        ;
+7187    85 B8       STA $B8         ;
+7189    A9 01       LDA #$01        ;
+718B    85 D4       STA $D4         ;
+718D    85 C5       STA $C5         ;
+718F    20 BB 7E    JSR $7EBB       ; A = 00 if the given player is alive (GPS) otherwise FF
+7192    F0 0F       BEQ ---         ;
+7194    A6 D4       LDX $D4         ;
+7196    BD 9F EF    LDA $EF9F,X     ;
+7199    F0 05       BEQ ---         ;
+719B    A9 00       LDA #$00        ;
+719D    9D 9F EF    STA $EF9F,X     ;
+71A0    4C 48 72    JMP $7248       ;
+```
+
+```
+71A3    A6 D4       LDX $D4         ;
+71A5    BD 9F EF    LDA $EF9F,X     ;
+71A8    F0 F6       BEQ ---         ;
+71AA    C9 38       CMP #$38        ;
+71AC    F0 F2       BEQ ---         ;
+71AE    20 4B 08    JSR $084B       ;
+71B1    20 01 85    JSR $8501       ;
+71B4    20 05 87    JSR $8705       ;
+71B7    20 30 08    JSR $0830       ; something to do with printing character's name
 
 
-717C    D9 A9 02 20 20 03 2C 10 C0 A9 00 85 B8 A9 01 85
-718C    D4 85 C5 20 BB 7E F0 0F A6 D4 BD 9F EF F0 05 A9
-719C    00 9D 9F EF 4C 48 72 A6 D4 BD 9F EF F0 F6 C9 38
-71AC    F0 F2 20 4B 08 20 01 85 20 05 87 20 30 08 20 21
+71BA    20 21
 71BC    08 8D D7 BA 00 20 2D 08 A0 1E B1 FE 8D 6E 7D 18
 71CC    69 25 20 7E 08 20 21 08 8D 1E 00 20 00 08 D0 03
 71DC    4C 45 41 C9 A0 D0 03 4C 45 41 C9 8D D0 03 4C C8
@@ -3043,27 +3086,40 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 
 ;; DATA
 
+; $7E6C gets altered
+
 7E6C    00 08 10 18 20 28 30 40 28 38 40 60 60 80 50 A0
 7E7C    FF 60 80 90 A0 B0 C0 D0 F8 00 00 00 FF 00 00 00
 7E8C    FF FF FF 00 FF 00 FF FF 00
+```
 
+```
 ;;
+; related to offset into $7E24 or $7E48
+;
+; if A < 128, return A
+; if A < 144, return (A - 128) // 2
+; return ((A - 128) // 4) + 4
 
-7E95    10 0C       BPL ---         ;
-7E97    29 7F       AND #$7F        ;
-7E99    4A          LSR A           ;
-7E9A    C9 08       CMP #$08        ;
-7E9C    90 04       BCC ---         ;
-7E9E    4A          LSR A           ;
+7E95    10 0C       BPL $7EA2       ; if high-bit not set, return
+7E97    29 7F       AND #$7F        ; clear high-bit
+7E99    4A          LSR A           ; shift right
+7E9A    C9 08       CMP #$08        ; if A < 8,
+7E9C    90 04       BCC $7EA2       ;   return
+7E9E    4A          LSR A           ; shift right again
 7E9F    18          CLC             ;
-7EA0    69 04       ADC #$04        ;
+7EA0    69 04       ADC #$04        ; add 4
 7EA2    60          RTS             ;
+```
 
+```
 7EA3    29 1F       AND #$1F        ;
 7EA5    18          CLC             ;
 7EA6    69 24       ADC #$24        ;
 7EA8    60          RTS             ;
+```
 
+```
 ;;
 ; return 00 if the given player is awake (GP) otherwise FF
 
@@ -3122,8 +3178,28 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 
 7EFA    A9 FF       LDA #$FF        ; return 0xFF
 
-7EFC    60 C9 00 F0 14 8D 16 7F 20 4E 08 CD 16 7F 90 07
-7F0C    38 ED 16 7F 4C 07 7F C9 00 60 00 85 DA 86 D9 20
+7EFC    60          RTS             ;
+```
+
+```
+7EFD    C9 00       CMP #$00        ;
+7EFF    F0 14       BEQ $7F15       ;
+7F01    8D 16 7F    STA $7F16       ;
+7F04    20 4E 08    JSR $084E       ; random number
+
+7F07    CD 16 7F    CMP $7F16       ;
+7F0A    90 07       BCC $7F13       ;
+7F0C    38          SEC             ;
+7F0D    ED 16 7F    SBC $7F16       ;
+7F10    4C 07 7F    JMP $7F07       ;
+7F13    C9 00       CMP #$00        ;
+7F15    60          RTS             ;
+
+7F16    00
+```
+
+```
+7F17    85 DA 86 D9 20
 7F1C    BC 46 10 03 4C DF 7F BD 60 EE C9 8C F0 3C C9 8E
 7F2C    F0 38 A0 1F B9 60 EE F0 18 B9 20 EE C5 FA D0 11
 7F3C    B9 40 EE C5 FB D0 0A B9 60 EE C9 3C F0 03 4C DF
@@ -3630,7 +3706,7 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 
 8679    20 F9 86    JSR $86F9       ;
 867C    A9 1E       LDA #$1E        ;
-867E    20 FD 7E    JSR $7EFD       ;
+867E    20 FD 7E    JSR $7EFD       ; some random manipulation
 8681    20 28 85    JSR $8528       ;
 8684    20 BE 85    JSR $85BE       ;
 8687    60          RTS             ;
@@ -3663,9 +3739,9 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 86C8    85 1B       STA $1B         ;
 86CA    A5 0F       LDA $0F         ;
 86CC    85 D4       STA $D4         ;
-86CE    20 4E 08    JSR $084E       ;
+86CE    20 4E 08    JSR $084E       ; random number
 86D1    30 1B       BMI ---         ;
-86D3    20 BB 7E    JSR $7EBB       ;
+86D3    20 BB 7E    JSR $7EBB       ; A = 00 if the given player is alive (GPS) otherwise FF
 86D6    D0 16       BNE ---         ;
 86D8    A5 0B       LDA $0B         ;
 86DA    10 07       BPL ---         ;
@@ -3673,7 +3749,7 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 86DE    BD 9F EF    LDA $EF9F,X     ;
 86E1    F0 0B       BEQ ---         ;
 86E3    A9 19       LDA #$19        ;
-86E5    20 FD 7E    JSR $7EFD       ;
+86E5    20 FD 7E    JSR $7EFD       ; some random manipulation
 86E8    20 28 85    JSR $8528       ;
 86EB    20 BE 85    JSR $85BE       ;
 86EE    C6 D4       DEC $D4         ;
@@ -3722,7 +3798,7 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 8741    D0 F9       BNE ---         ;
 8743    24 CD       BIT $CD         ;
 8745    10 08       BPL ---         ;
-8747    20 4E 08    JSR $084E       ;
+8747    20 4E 08    JSR $084E       ; random number
 874A    30 03       BMI ---         ;
 874C    2C 30 C0    BIT $C030       ;
 874F    CA          DEX             ;
@@ -3745,7 +3821,7 @@ C9 D4 A7 D3 A0 C4 C1 D2 CB A1 8D 00   IT'S DARK!..
 8770    D0 F9       BNE ---         ;
 8772    24 CD       BIT $CD         ;
 8774    10 08       BPL ---         ;
-8776    20 4E 08    JSR $084E       ;
+8776    20 4E 08    JSR $084E       ; random number
 8779    30 03       BMI ---         ;
 877B    2C 30 C0    BIT $C030       ;
 877E    E8          INX             ;

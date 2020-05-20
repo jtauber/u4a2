@@ -28,7 +28,7 @@ LEN $0095
 0335  4C 1B 08      JMP $081B     ; PRINT routine in SUBS
 
 0338  AA            TAX
-0339  30 22         BMI ---
+0339  30 22         BMI $035D     ; if A >= 0x80, go to $035D to load MUS_
 
 033B  CD 00 F0      CMP $F000     ; this is where MUSA is loaded
 033E  B0 0C         BCS $034C

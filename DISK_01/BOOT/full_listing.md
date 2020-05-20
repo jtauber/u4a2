@@ -1640,7 +1640,7 @@ nav_order: 1
 
 ; set up initial $0200 - $025E based on $6E73
 
-6DDD    A2 5E       LDX #$5E        ;
+6DDD    A2 5E       LDX #$5E        ; 19 x 5 - 1
 
 6DDF    BD 73 6E    LDA $6E73,X     ;
 6DE2    9D 00 02    STA $0200,X     ;
