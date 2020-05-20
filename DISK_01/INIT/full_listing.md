@@ -96,15 +96,15 @@ nav_order: 1
 40FE  E6 FF         INC $FF       ; .
 4100  D0 F5         BNE $40F7     ; .
 
-4102  2C 83 C0      BIT $C083     ; more bank switching ???
-4105  2C 8B C0      BIT $C08B     ; more bank switching ???
-4108  2C 8B C0      BIT $C08B     ; more bank switching ???
+4102  2C 83 C0      BIT $C083     ; $D000 BANK 2
+4105  2C 8B C0      BIT $C08B     ; $D000 BANK 1
+4108  2C 8B C0      BIT $C08B     ; $D000 BANK 1
 410B  20 1B 08      JSR $081B     ; PRINT routine from SUBS
 
 410E  84 C2 CC CF C1 C4 A0 D3 81 C8 D0 B0 8D                        ^DBLOAD S.HP0^M
 411B  00
 
-411C  2C 83 C0      BIT $C083     ; more bank switching ???
+411C  2C 83 C0      BIT $C083     ; $D000 BANK 2
 411F  20 1B 08      JSR $081B     ; PRINT routine from SUBS
 
 4122  84 C2 CC CF C1 C4 A0 D3 81 C8 D0 B1 8D                        ^DBLOAD S.HP1^M

@@ -9,8 +9,8 @@ nav_order: 1
 | INIT |                         | `$4000`-`$50E5`   |
 | SEL  | BLOADed by INIT `$4095` | `$0320`-`$03B5`   |
 | SUBS | BLOADed by INIT `$40A7` | `$0800`-`$2000`   |
-| SHP0 | BLOADed by INIT `$410E` | `$D000`-`$E000`   |
-| SHP1 | BLOADed by INIT `$4122` | `$D000`-`$E000`   |
+| SHP0 | BLOADed by INIT `$410E` | `$D000`-`$E000` bank 1  |
+| SHP1 | BLOADed by INIT `$4122` | `$D000`-`$E000` bank 2  |
 | TBLS | BLOADed by INIT `$412F` | `$E000`-`$E400`   |
 | HTXT | BLOADed by INIT `$4143` | `$E400`-`$E800`   |
 | BOOT | BRUN    by INIT `$4157` | `$6000`-`$7394`   |
