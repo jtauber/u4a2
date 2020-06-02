@@ -57,14 +57,15 @@ Other files still to investigate.
 * `$ED00` overall attributes
 * `$EE00` LIST or disk buffer
 
-### player data vector
+### character data vector
 
-* `$00` thru `$07` - name?
-* `$12` - player status (e.g. `G` or `P` or `D`)
-* `$18` - most-significant digit of player health
-* `$19` - lower two digits of player health
-* `$1A` - most-significant digit of max player health
-* `$1B` - lower two digits of max player health
+* `$00` thru `$07` - name? (maybe all the way to `$0F`?)
+* `$10` - character gender (0x5C for Male and 0x7B for Female ?)
+* `$12` - character status (e.g. `G` or `P` or `S` or `D`)
+* `$18` - most-significant digit of character health
+* `$19` - lower two digits of character health
+* `$1A` - most-significant digit of max character health
+* `$1B` - lower two digits of max character health
 
 ### ED00
 

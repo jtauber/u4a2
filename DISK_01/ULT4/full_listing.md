@@ -59,17 +59,19 @@ LEN $4800
 4066  84 C2 CC CF C1 C4 A0 CC C9 D3 D4 AC C1 A4 C5 C5 B0 B0 8D                  ^DBLOAD LIST,A$EE00^M
 4079  84 C2 CC CF C1 C4 A0 D2 CF D3 D4 AC C1 A4 C5 C3 B0 B0 8D 00               ^DBLOAD ROST,A$EC00^M^@
 
-408D    A9 00       LDA #$00        ;
+;;
+
+408D    A9 00       LDA #$00        ; .
 408F    85 0D       STA $0D         ; _0D = 0x00
 4091    85 F4       STA $F4         ; _F4 = 0x00
 4093    85 0A       STA $0A         ; _0A = 0x00
 4095    85 14       STA $14         ; _14 = 0x00
-4097    A9 01       LDA #$01        ;
+4097    A9 01       LDA #$01        ; .
 4099    85 0B       STA $0B         ; _0B = 0x01
 409B    85 F5       STA $F5         ; _F5 = 0x01
 409D    20 45 08    JSR $0845       ; DISPLAY STATS
 40A0    20 03 08    JSR $0803       ; ???
-40A3    A9 FF       LDA #$FF        ;
+40A3    A9 FF       LDA #$FF        ; .
 40A5    85 CD       STA $CD         ; _CD = 0xFF
 40A7    A9 CF       LDA #$CF        ; .
 40A9    20 20 03    JSR $0320       ; call $0320 with A = 0xCF
