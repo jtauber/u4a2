@@ -16,7 +16,6 @@ Note that filenames actually have a ^A inserted between the first and second cha
 
 ## Files not yet covered below
 
-NEWGAME
 TREE.SPK
 PRTL.SPK
 LOOK.SPK
